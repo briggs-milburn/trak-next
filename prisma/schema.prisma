@@ -1,0 +1,56 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model user {
+    id        Int             @id @default(autoincrement())
+    email     String          @unique
+    password  String
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @default(now()) @updatedAt
+    isActive  Boolean         @default(true)
+    profile   profile?
+    tokens    tokensOnUsers[]
+}
+
+model profile {
+    id        Int     @id @default(autoincrement())
+    userId    Int     @unique
+    avatarUrl String?
+    firstName String?
+    lastName  String?
+    user      user    @relation(fields: [userId], references: [id])
+}
+
+model token {
+    id        Int             @id @default(autoincrement())
+    tokenId   String          @unique
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @default(now()) @updatedAt
+    users     tokensOnUsers[]
+    locations location[]
+}
+
+model location {
+    id        Int      @id @default(autoincrement())
+    tokenId   Int
+    latitude  Float
+    longitude Float
+    timestamp DateTime @default(now())
+    token     token    @relation(fields: [tokenId], references: [id])
+}
+
+model tokensOnUsers {
+    user       user     @relation(fields: [userId], references: [id])
+    userId     Int
+    token      token    @relation(fields: [tokenId], references: [id])
+    tokenId    Int
+    assignedAt DateTime @default(now())
+
+    @@id([userId, tokenId])
+}
