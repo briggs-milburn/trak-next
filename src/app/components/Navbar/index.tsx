@@ -1,16 +1,14 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store/store";
-import { useModal } from "../ModalContext";
-import {
-  logout as logoutAction,
-  setUser,
-} from "../../store/features/authSlice";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store/store';
+import { useModal } from '../ModalContext';
+import { logout as logoutAction } from '../../store/features/authSlice';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -33,29 +31,25 @@ const Navbar = () => {
         setProfileOpen(false);
       }
     }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
   // Logout handler calls logout API and Redux + redirects
   async function handleLogout() {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch('/api/auth/logout', { method: 'POST' });
       dispatch(logoutAction());
-      router.push("/login");
+      router.push('/login');
     } catch {
       // ignore error
     }
   }
 
   // Generate initials fallback for avatar
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : user?.email?.[0].toUpperCase() || "?";
+  const initials = user?.profile
+    ? `${user.profile.firstName[0]}${user.profile.lastName[0]}`
+    : user?.email;
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm sticky top-0 z-50">
@@ -71,39 +65,16 @@ const Navbar = () => {
         {/* Desktop links */}
         <ul className="hidden md:flex space-x-4 font-medium text-gray-700">
           <li>
-            <button
+            <Link
               href="/dashboard"
               className={`px-3 py-2 rounded-md hover:bg-blue-50 ${
-                pathname === "/dashboard"
-                  ? "bg-blue-100 text-blue-700 font-semibold"
-                  : ""
+                pathname === '/dashboard'
+                  ? 'bg-blue-100 text-blue-700 font-semibold'
+                  : ''
               }`}
             >
               Dashboard
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => {
-                setMenuOpen(false);
-                openProfile();
-              }}
-              className="px-3 py-2 rounded-md hover:bg-blue-50"
-            >
-              Profile
-            </button>
-          </li>
-          <li>
-            <button
-              href="/dashboard/settings"
-              className={`px-3 py-2 rounded-md hover:bg-blue-50 ${
-                router.pathname === "/dashboard/settings"
-                  ? "bg-blue-100 text-blue-700 font-semibold"
-                  : ""
-              }`}
-            >
-              Settings
-            </button>
+            </Link>
           </li>
         </ul>
 
@@ -140,27 +111,28 @@ const Navbar = () => {
           className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 rounded-full"
         >
           {user?.email ? (
-            user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.name || user.email}
-                className="h-10 w-10 rounded-full object-cover"
-              />
-            ) : (
-              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold select-none">
-                {initials}
-              </div>
-            )
+            <Image
+              src={user.profile?.avatarUrl || '/default-avatar.png'}
+              alt={user.profile?.firstName || user.email}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full object-cover"
+              priority
+            />
+          ) : user ? (
+            <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold select-none">
+              {initials}
+            </div>
           ) : (
             <div className="h-10 w-10 rounded-full bg-gray-300 animate-pulse" />
           )}
           <span className="hidden sm:block font-medium text-gray-700">
-            {user?.name || user?.email}
+            {user?.profile?.firstName || user?.email}
           </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className={`h-4 w-4 stroke-current transition-transform ${
-              profileOpen ? "rotate-180" : "rotate-0"
+              profileOpen ? 'rotate-180' : 'rotate-0'
             }`}
             fill="none"
             viewBox="0 0 24 24"

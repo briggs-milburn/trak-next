@@ -20,10 +20,11 @@ export async function GET(req: NextRequest) {
     };
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: decoded.userId, email: decoded.email, deletedAt: null },
       select: {
         id: true,
         email: true,
+        profile: true,
         tokens: {
           select: {
             token: {
@@ -43,9 +44,9 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-    });
+    } );
 
-    if (!user) {
+    if ( !user || user == null ) {
       return NextResponse.json({ user: null }, { status: 401 });
     }
 
@@ -64,6 +65,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ user: { ...user, tokens, locations } });
   } catch {
-    return NextResponse.json({ user: null });
+    return NextResponse.json({ user: null }, { status: 401 });
   }
 }

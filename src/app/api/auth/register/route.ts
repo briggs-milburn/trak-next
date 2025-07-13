@@ -23,13 +23,15 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const firstName = name?.split(" ")[0] || "";
+    const lastName = name?.split(" ").slice(1).join(" ") || "";
 
     await prisma.user.create({
-      data: { email, password: hashedPassword, name },
+      data: { email, password: hashedPassword, isActive: true, profile: { create: { firstName, lastName, avatarUrl: null } } },
     });
 
     return NextResponse.json({ message: "User created" }, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

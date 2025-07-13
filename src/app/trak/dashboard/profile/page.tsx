@@ -14,7 +14,7 @@ export default async function ProfilePage() {
   try {
     payload = jwt.verify(token, JWT_SECRET) as {
       userId: number;
-      email: string;
+      email: string; 
     };
   } catch {
     redirect("/login");

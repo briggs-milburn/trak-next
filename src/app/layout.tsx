@@ -1,6 +1,7 @@
 import "./styles/globals.css";
 import { Inter } from "next/font/google";
 import { Providers } from "./providers/providers";
+import AuthenticatedPage from "./components/AuthenticatedPage";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-gray-50 text-gray-800 antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <AuthenticatedPage>{children}</AuthenticatedPage>
+        </Providers>
       </body>
     </html>
   );

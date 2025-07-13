@@ -17,7 +17,7 @@ export const isAuthenticated = (request: NextRequest): boolean => {
     try {
         const decoded = jwt.verify(token, jwtSecret);
         return !!decoded;
-    } catch (error) {
+    } catch(error)  {
         console.error("Authentication error:", error);
         return false;
     }

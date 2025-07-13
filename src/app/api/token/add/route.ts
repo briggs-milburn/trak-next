@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
-import bcrypt from "bcrypt";
-import { isAuthorized } from "../../auth/util";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '../../../../lib/prisma';
+import { isAuthorized } from '../../auth/util';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,11 +20,6 @@ export async function POST(req: NextRequest) {
             {
               userId: userId || authResult.userId,
               assignedAt: new Date(),
-              user: {
-                connect: {
-                  id: userId || authResult.userId,
-                },
-              },
             },
           ],
         },
@@ -33,7 +27,7 @@ export async function POST(req: NextRequest) {
     });
   } catch {
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

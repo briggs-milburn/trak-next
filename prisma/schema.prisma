@@ -13,6 +13,7 @@ model user {
     password  String
     createdAt DateTime        @default(now())
     updatedAt DateTime        @default(now()) @updatedAt
+    deletedAt DateTime?       
     isActive  Boolean         @default(true)
     profile   profile?
     tokens    tokensOnUsers[]

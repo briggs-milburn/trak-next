@@ -5,45 +5,51 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export async function POST(req: NextRequest) {
+export async function POST( req: NextRequest ) {
   try {
     const { email, password } = await req.json();
 
-    if (!email || !password) {
+    if ( !email || !password ) {
       return NextResponse.json(
         { error: "Email and password are required" },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    // Check if user exists
+    const user = await prisma.user.findUnique( {
+      where: { email, deletedAt: null },
+      include: { profile: true }
+    } );
+    if ( !user ) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    const valid = await bcrypt.compare(password, user.password);
-    console.log(user.password, password, valid);
-    if (!valid) {
+    const valid = await bcrypt.compare( password, user.password );
+    if ( !valid ) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 } 
       );
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+    const token = jwt.sign( { userId: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: "7d",
-    });
+    } );
 
     // Set HttpOnly cookie
-    const response = NextResponse.json({
-      user: { email: user.email ?? undefined },
-    });
+    const response = NextResponse.json( {
+      user: {
+        email: user.email ?? undefined,
+        profile: user.profile ?? undefined
+      },
+    } );
 
     // Set cookie using new cookies API
-    response.cookies.set({
+    response.cookies.set( {
       name: "auth_token",
       value: token,
       httpOnly: true,
@@ -51,10 +57,10 @@ export async function POST(req: NextRequest) {
       path: "/",
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-    });
+    } );
 
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

@@ -1,8 +1,12 @@
-import Image from "next/image";
+import AuthenticatedPage from "./components/AuthenticatedPage";
 import DashboardPage from "./trak/dashboard/page";
+
+export const runtime = "edge";
 
 export default function Home() {
   return (
-    <DashboardPage />
+    <AuthenticatedPage>
+      <DashboardPage />
+    </AuthenticatedPage>
   );
 }
